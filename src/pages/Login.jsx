@@ -13,6 +13,7 @@ export function Login() {
   const [forgotMessage, setForgotMessage] = useState('');
   
   const login = useStore(state => state.login);
+  const forgotPassword = useStore(state => state.forgotPassword);
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
@@ -26,10 +27,15 @@ export function Login() {
     }
   };
 
-  const handleForgot = (e) => {
+  const handleForgot = async (e) => {
     e.preventDefault();
-    setForgotMessage('Se ha enviado un código de recuperación a tu email (Simulado).');
-    // En un caso real, aquí llamaríamos a un endpoint de GAS para enviar el email.
+    setError('');
+    try {
+      await forgotPassword(email);
+      setForgotMessage('Se ha enviado un código de recuperación a tu email.');
+    } catch (err) {
+      setError('Error al enviar el código. Verifica tu conexión.');
+    }
   };
 
   return (

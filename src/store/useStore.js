@@ -103,6 +103,18 @@ export const useStore = create((set, get) => ({
     }
   },
 
+  forgotPassword: async (email) => {
+    set({ loading: true });
+    try {
+      const res = await apiRequest('forgotPassword', 'POST', { email });
+      set({ loading: false });
+      return res;
+    } catch (error) {
+      set({ error: error.message, loading: false });
+      throw error;
+    }
+  },
+
   sendBlast: async (tipo, subject, rows) => {
     set({ loading: true });
     try {
