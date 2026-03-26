@@ -103,6 +103,16 @@ export const useStore = create((set, get) => ({
     }
   },
 
+  deleteMeeting: async (row) => {
+    set({ loading: true });
+    try {
+      await api.deleteMeeting(row);
+      await get().fetchMeetings();
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
   autoMark: async () => {
     set({ loading: true });
     try {

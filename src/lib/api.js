@@ -55,6 +55,7 @@ export const api = {
   syncGoogleAds: (row)            => apiRequest('syncGoogleAds', 'POST', { row }),
   addMeeting:    (meeting)        => apiRequest('addMeeting', 'POST', meeting),
   updateMeeting: (row, data)      => apiRequest('updateMeeting', 'POST', { row, ...data }),
+  deleteMeeting: (row)            => apiRequest('deleteMeeting', 'POST', { row }),
   forgotPassword:(email)          => apiRequest('forgotPassword', 'POST', { email }),
 };
 

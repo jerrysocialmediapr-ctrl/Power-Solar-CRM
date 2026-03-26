@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import {
   Calendar as CalendarIcon, Clock, MapPin, Phone, Plus,
   CheckCircle2, XCircle, ChevronDown, Search, User,
-  MessageSquare, Video, Building2, Wifi
+  MessageSquare, Video, Building2, Trash2, AlertTriangle
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { cn } from '../lib/utils';
@@ -23,10 +23,11 @@ const MEETING_LUGARES = ["Oficina","Ubicación del cliente","En línea"];
 const MEETING_STATUSES = ["Pendiente","Completado","Cancelado"];
 
 export function Meetings() {
-  const { meetings, leads, addMeeting, updateMeeting, loading } = useStore();
+  const { meetings, leads, addMeeting, updateMeeting, deleteMeeting, loading } = useStore();
   const [filter, setFilter] = useState('Todos');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const filteredMeetings = useMemo(() => {
     let list = [...meetings];
@@ -88,6 +89,30 @@ export function Meetings() {
           title={`Editar: ${selectedMeeting.Título || selectedMeeting.Nombre}`}
         />
       )}
+
+      {/* Delete Confirm */}
+      {deleteConfirm && (
+        <Modal isOpen={!!deleteConfirm} onClose={() => setDeleteConfirm(null)}
+          title="Eliminar Meeting"
+          footer={
+            <>
+              <button onClick={() => setDeleteConfirm(null)} className="btn btn-ghost">Cancelar</button>
+              <button onClick={async () => { await deleteMeeting(deleteConfirm._row); setDeleteConfirm(null); }}
+                className="btn bg-red-500 hover:bg-red-600 text-white">
+                Sí, eliminar
+              </button>
+            </>
+          }
+        >
+          <div className="text-center py-4">
+            <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-8 h-8" />
+            </div>
+            <p className="text-slate-300">¿Eliminar el meeting de <strong className="text-white">{deleteConfirm.Título || deleteConfirm.Nombre}</strong>?</p>
+            <p className="text-slate-500 text-sm mt-1">Esta acción no se puede deshacer.</p>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
@@ -95,7 +120,7 @@ export function Meetings() {
 // ============================================================
 // MEETING CARD
 // ============================================================
-function MeetingCard({ meeting, onComplete, onCancel, onEdit }) {
+function MeetingCard({ meeting, onComplete, onCancel, onEdit, onDelete }) {
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [notes, setNotes] = useState(meeting.Notas || '');
   const isPending = meeting.Estado === 'Pendiente';
@@ -200,6 +225,18 @@ function MeetingCard({ meeting, onComplete, onCancel, onEdit }) {
           <button onClick={onCancel}
             className="btn bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 p-3 rounded-2xl" title="Cancelar">
             <XCircle className="w-5 h-5" />
+          </button>
+          <button onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            className="btn bg-slate-700/40 text-slate-500 hover:bg-red-500/20 hover:text-red-400 border border-border p-3 rounded-2xl" title="Eliminar">
+            <Trash2 className="w-5 h-5" />
+          </button>
+        </div>
+      )}
+      {!isPending && (
+        <div className="flex flex-row md:flex-col justify-center gap-2" onClick={e => e.stopPropagation()}>
+          <button onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            className="btn bg-slate-700/40 text-slate-500 hover:bg-red-500/20 hover:text-red-400 border border-border p-3 rounded-2xl" title="Eliminar">
+            <Trash2 className="w-5 h-5" />
           </button>
         </div>
       )}
