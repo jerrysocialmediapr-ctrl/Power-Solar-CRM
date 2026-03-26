@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0a0f1e;
+  --color-surface: #111827;
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-primary: #3b82f6;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-accent: #3b82f6;
+
+  --font-sans: "DM Sans", system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-slate-200 font-sans;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-800 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-700;
+}
+
+@layer components {
+  .glass {
+    @apply bg-surface/50 backdrop-blur-md border border-border;
+  }
+  
+  .card {
+    @apply bg-surface border border-border rounded-xl p-6;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20;
+  }
+
+  .btn-secondary {
+    @apply bg-slate-800 text-white hover:bg-slate-700 border border-border;
+  }
+
+  .btn-ghost {
+    @apply text-slate-400 hover:text-white hover:bg-slate-800;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+}
