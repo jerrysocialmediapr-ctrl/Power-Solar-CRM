@@ -21,9 +21,8 @@ function NotificationManager() {
 
   useEffect(() => {
     if (!isAuthenticated) return;
-
-    // Ask for notification permission once user is logged in
-    requestNotificationPermission();
+    
+    // Polling is fine to start automatically
 
     // Start polling for new leads every 2 minutes
     if (api && api.getLeads) {
@@ -45,7 +44,6 @@ function NotificationManager() {
 }
 
 function App() {
-  console.log('🚀 Power Solar CRM: App rendering');
   return (
     <BrowserRouter>
       <NotificationManager />

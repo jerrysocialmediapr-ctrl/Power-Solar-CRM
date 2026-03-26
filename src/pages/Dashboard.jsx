@@ -75,7 +75,8 @@ export function Dashboard() {
   }, {});
 
   const recentLeads = [...leads]
-    .sort((a, b) => new Date(b.Fecha) - new Date(a.Fecha))
+    .filter(l => l['Fecha Creación'])
+    .sort((a, b) => new Date(b['Fecha Creación']) - new Date(a['Fecha Creación']))
     .slice(0, 8);
 
   return (
@@ -203,7 +204,14 @@ export function Dashboard() {
                     </span>
                   </td>
                   <td className="py-4 text-slate-400 text-sm">
-                    {format(new Date(lead.Fecha), 'd MMM, p', { locale: es })}
+                    {(() => {
+                      try {
+                        const d = lead['Fecha Creación'] ? new Date(lead['Fecha Creación']) : null;
+                        return d && !isNaN(d.getTime()) ? format(d, 'd MMM, p', { locale: es }) : '—';
+                      } catch (e) {
+                        return '—';
+                      }
+                    })()}
                   </td>
                 </tr>
               ))}

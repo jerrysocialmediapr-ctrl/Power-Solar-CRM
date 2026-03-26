@@ -113,7 +113,14 @@ export function Leads() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-400">
-                    {lead.Fecha ? format(new Date(lead.Fecha), 'd MMM', { locale: es }) : '—'}
+                    {(() => {
+                      try {
+                        const d = lead['Fecha Creación'] ? new Date(lead['Fecha Creación']) : null;
+                        return d && !isNaN(d.getTime()) ? format(d, 'd MMM', { locale: es }) : '—';
+                      } catch (e) {
+                        return '—';
+                      }
+                    })()}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-1">
