@@ -51,4 +51,8 @@ export const api = {
   addMeeting: (meeting) => apiRequest('addMeeting', 'POST', meeting),
   updateMeeting: (row, data) => apiRequest('updateMeeting', 'POST', { row, ...data }),
   forgotPassword: (email) => apiRequest('forgotPassword', 'POST', { email }),
+  deleteLead: (row) => apiRequest('deleteLead', 'POST', { row }),
+  convertLead: (row, data) => apiRequest('convertLead', 'POST', { row, ...data }),
 };
+
+export { apiRequest };

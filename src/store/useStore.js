@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { api } from '../lib/api';
+import { api, apiRequest } from '../lib/api';
 
 export const useStore = create((set, get) => ({
   leads: [],
@@ -63,6 +63,26 @@ export const useStore = create((set, get) => ({
     }
   },
 
+  deleteLead: async (row) => {
+    set({ loading: true });
+    try {
+      await api.deleteLead(row);
+      await get().fetchLeads();
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  convertLead: async (row, data) => {
+    set({ loading: true });
+    try {
+      await api.convertLead(row, data);
+      await get().fetchLeads();
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
   addMeeting: async (meeting) => {
     set({ loading: true });
     try {
@@ -106,7 +126,7 @@ export const useStore = create((set, get) => ({
   forgotPassword: async (email) => {
     set({ loading: true });
     try {
-      const res = await apiRequest('forgotPassword', 'POST', { email });
+      const res = await api.forgotPassword(email);
       set({ loading: false });
       return res;
     } catch (error) {
