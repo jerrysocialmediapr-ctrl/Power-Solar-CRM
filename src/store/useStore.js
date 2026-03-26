@@ -10,6 +10,24 @@ const getSafeUser = () => {
   }
 };
 
+const sanitize = (val) => {
+  if (val === null || val === undefined) return '';
+  if (typeof val === 'object' && !(val instanceof Date)) {
+    try { return JSON.stringify(val); } catch(e) { return String(val); }
+  }
+  return val;
+};
+
+const sanitizeRow = (row) => {
+  const newRow = { ...row };
+  Object.keys(newRow).forEach(key => {
+    if (key !== '_row') {
+      newRow[key] = sanitize(newRow[key]);
+    }
+  });
+  return newRow;
+};
+
 export const useStore = create((set, get) => ({
   leads: [],
   meetings: [],
@@ -37,7 +55,8 @@ export const useStore = create((set, get) => ({
     set({ loading: true });
     try {
       const data = await api.getLeads();
-      set({ leads: Array.isArray(data) ? data : [], loading: false });
+      const sanitized = Array.isArray(data) ? data.map(sanitizeRow) : [];
+      set({ leads: sanitized, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });
     }
@@ -47,7 +66,8 @@ export const useStore = create((set, get) => ({
     set({ loading: true });
     try {
       const data = await api.getMeetings();
-      set({ meetings: Array.isArray(data) ? data : [], loading: false });
+      const sanitized = Array.isArray(data) ? data.map(sanitizeRow) : [];
+      set({ meetings: sanitized, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });
     }
