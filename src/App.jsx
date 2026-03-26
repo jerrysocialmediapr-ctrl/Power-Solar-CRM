@@ -26,7 +26,9 @@ function NotificationManager() {
     requestNotificationPermission();
 
     // Start polling for new leads every 2 minutes
-    cleanupRef.current = startLeadPolling(() => api.getLeads(), 2 * 60 * 1000);
+    if (api && api.getLeads) {
+      cleanupRef.current = startLeadPolling(() => api.getLeads(), 2 * 60 * 1000);
+    }
 
     return () => {
       if (cleanupRef.current) cleanupRef.current();

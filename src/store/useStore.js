@@ -1,18 +1,28 @@
 import { create } from 'zustand';
 import { api, apiRequest } from '../lib/api';
 
+const getSafeUser = () => {
+  try {
+    const u = localStorage.getItem('ps_user');
+    return u ? JSON.parse(u) : null;
+  } catch (e) {
+    return null;
+  }
+};
+
 export const useStore = create((set, get) => ({
   leads: [],
   meetings: [],
   loading: false,
   error: null,
-  user: JSON.parse(localStorage.getItem('ps_user')) || null,
+  user: getSafeUser(),
+  isAuthenticated: !!localStorage.getItem('ps_user'), // Use user existence as auth check
 
   login: (email, password) => {
     if (email === 'jerrypowersolar@gmail.com' && password === 'Ian110809') {
       const user = { email, name: 'Jerry Encarnación' };
       localStorage.setItem('ps_user', JSON.stringify(user));
-      set({ user });
+      set({ user, isAuthenticated: true });
       return true;
     }
     return false;
@@ -20,7 +30,7 @@ export const useStore = create((set, get) => ({
 
   logout: () => {
     localStorage.removeItem('ps_user');
-    set({ user: null });
+    set({ user: null, isAuthenticated: false });
   },
 
   fetchLeads: async () => {
