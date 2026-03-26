@@ -8,19 +8,20 @@ const TOKEN = import.meta.env.VITE_GAS_TOKEN;
  * The action + payload is encoded as a base64 JSON string in the "data" param.
  */
 async function apiRequest(action, method = 'GET', body = null) {
-  if (!GAS_URL) throw new Error('VITE_GAS_URL no está configurada. Revisa las variables de entorno en Vercel.');
-
-  const url = new URL(GAS_URL);
-  url.searchParams.append('token', TOKEN);
-  url.searchParams.append('action', action);
-
-  // For write operations, encode the body as a "data" query param
-  // GAS doGet will receive it; this avoids the POST CORS redirect issue
-  if (body) {
-    url.searchParams.append('data', JSON.stringify(body));
+  if (!GAS_URL) {
+    console.warn('VITE_GAS_URL no está configurada.');
+    return { error: 'VITE_GAS_URL no configurada' };
   }
 
   try {
+    const url = new URL(GAS_URL);
+    url.searchParams.append('token', TOKEN);
+    url.searchParams.append('action', action);
+
+    if (body) {
+      url.searchParams.append('data', JSON.stringify(body));
+    }
+
     const response = await fetch(url.toString(), {
       method: 'GET',
       redirect: 'follow',

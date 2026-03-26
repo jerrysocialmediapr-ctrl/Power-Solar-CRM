@@ -45,6 +45,7 @@ function NotificationManager() {
 }
 
 function App() {
+  console.log('🚀 Power Solar CRM: App rendering');
   return (
     <BrowserRouter>
       <NotificationManager />
