@@ -19,7 +19,7 @@ const navItems = [
 ];
 
 export function Sidebar() {
-  const { leads } = useStore();
+  const { leads, logout } = useStore();
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-surface border-r border-border flex flex-col z-50">
@@ -29,7 +29,7 @@ export function Sidebar() {
         </div>
         <div>
           <h1 className="text-lg font-bold text-white tracking-tight">Power Solar</h1>
-          <p className="text-xs text-slate-500 font-medium">CRM v2.0</p>
+          <p className="text-xs text-slate-500 font-medium">CRM v2.1</p>
         </div>
       </div>
 
@@ -63,7 +63,10 @@ export function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-border">
-        <button className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200 group">
+        <button 
+          onClick={logout}
+          className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200 group"
+        >
           <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span className="font-medium">Cerrar Sesión</span>
         </button>

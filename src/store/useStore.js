@@ -6,6 +6,22 @@ export const useStore = create((set, get) => ({
   meetings: [],
   loading: false,
   error: null,
+  user: JSON.parse(localStorage.getItem('ps_user')) || null,
+
+  login: (email, password) => {
+    if (email === 'jerrypowersolar@gmail.com' && password === 'Ian110809') {
+      const user = { email, name: 'Jerry Encarnación' };
+      localStorage.setItem('ps_user', JSON.stringify(user));
+      set({ user });
+      return true;
+    }
+    return false;
+  },
+
+  logout: () => {
+    localStorage.removeItem('ps_user');
+    set({ user: null });
+  },
 
   fetchLeads: async () => {
     set({ loading: true });
