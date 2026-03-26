@@ -49,14 +49,14 @@ export function Dashboard() {
     );
   }
 
-  const status = (l) => l.Estado || l['Estado Lead'] || 'Pendiente';
+  const status = (l) => String(l.Estado || l['Estado Lead'] || 'Pendiente');
   const totalLeads = leads.length;
   const vendidos = leads.filter(l => status(l) === 'Vendido');
   const totalVendido = vendidos.length;
   const conversionRate = totalLeads > 0 ? (totalVendido / totalLeads) * 100 : 0;
   
   const revenue = vendidos.reduce((acc, l) => {
-    const val = parseFloat(String(l['Valor Venta'] || '0').replace(/[^0-9.]/g, ''));
+    const val = parseFloat(String(l['Factura Mensual'] || '0').replace(/[^0-9.]/g, ''));
     return acc + (isNaN(val) ? 0 : val);
   }, 0);
 
@@ -193,9 +193,9 @@ export function Dashboard() {
             <tbody className="divide-y divide-border">
               {recentLeads.map((lead) => (
                 <tr key={lead._row} className="hover:bg-slate-800/50 transition-colors group">
-                  <td className="py-4 font-bold text-slate-200">{lead.Nombre}</td>
-                  <td className="py-4 text-slate-400">{lead['Teléfono']}</td>
-                  <td className="py-4 text-slate-400">{lead.Pueblo}</td>
+                  <td className="py-4 font-bold text-slate-200">{String(lead.Nombre || '')}</td>
+                  <td className="py-4 text-slate-400">{String(lead['Teléfono'] || '')}</td>
+                  <td className="py-4 text-slate-400">{String(lead.Pueblo || '')}</td>
                   <td className="py-4">
                     <span className={cn("badge", getStatusBadgeStyles(status(lead)))}>
                       {status(lead)}
@@ -203,7 +203,7 @@ export function Dashboard() {
                   </td>
                   <td className="py-4">
                     <span className="text-xs font-bold text-slate-500 bg-slate-800 px-2 py-1 rounded-md">
-                      {lead['Origen del Lead']}
+                      {String(lead['Origen del Lead'] || '')}
                     </span>
                   </td>
                   <td className="py-4 text-slate-400 text-sm">

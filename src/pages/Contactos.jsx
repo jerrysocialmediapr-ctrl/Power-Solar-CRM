@@ -89,13 +89,13 @@ function ContactCard({ contact, onClick }) {
           {initials}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-white font-bold truncate group-hover:text-primary transition-colors">{contact.Nombre}</h3>
+          <h3 className="text-white font-bold truncate group-hover:text-primary transition-colors">{String(contact.Nombre || '')}</h3>
           <div className="flex items-center gap-1.5 mt-1 text-slate-500 text-xs">
             <span className={cn("badge py-0 px-2", getStatusBadgeStyles(contact.Estado || contact['Estado Lead']))}>
-              {contact.Estado || contact['Estado Lead'] || 'Pendiente'}
+              {String(contact.Estado || contact['Estado Lead'] || 'Pendiente')}
             </span>
             <span className="opacity-50">•</span>
-            <span>{contact['Origen del Lead']}</span>
+            <span>{String(contact['Origen del Lead'] || '')}</span>
           </div>
         </div>
       </div>
@@ -103,15 +103,15 @@ function ContactCard({ contact, onClick }) {
       <div className="space-y-3">
         <a href={`tel:${contact['Teléfono']}`} className="flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-colors" onClick={(e) => e.stopPropagation()}>
           <div className="p-1.5 bg-slate-800 rounded-lg"><Phone className="w-4 h-4" /></div>
-          {contact['Teléfono']}
+          {String(contact['Teléfono'] || '')}
         </a>
         <a href={`mailto:${contact.Email}`} className="flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-colors" onClick={(e) => e.stopPropagation()}>
           <div className="p-1.5 bg-slate-800 rounded-lg"><Mail className="w-4 h-4" /></div>
-          <span className="truncate">{contact.Email || 'Sin email'}</span>
+          <span className="truncate">{String(contact.Email || 'Sin email')}</span>
         </a>
         <div className="flex items-center gap-3 text-sm text-slate-400">
           <div className="p-1.5 bg-slate-800 rounded-lg"><MapPin className="w-4 h-4" /></div>
-          {contact.Pueblo}
+          {String(contact.Pueblo || '')}
         </div>
       </div>
 

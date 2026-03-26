@@ -94,24 +94,24 @@ export function Leads() {
                 <tr key={lead._row} className="hover:bg-slate-800/30 transition-colors group">
                   <td className="px-6 py-4 cursor-pointer" onClick={() => setSelectedLead(lead)}>
                     <div className="flex flex-col">
-                      <span className="font-bold text-white group-hover:text-primary transition-colors">{lead.Nombre}</span>
-                      <span className="text-xs text-slate-500">{lead.Email || lead['Teléfono']}</span>
+                      <span className="font-bold text-white group-hover:text-primary transition-colors">{String(lead.Nombre || '')}</span>
+                      <span className="text-xs text-slate-500">{String(lead.Email || lead['Teléfono'] || '')}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-400">
-                    <div className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{lead.Pueblo}</div>
+                    <div className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{String(lead.Pueblo || '')}</div>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-200 font-medium">
-                    {lead['Factura Mensual'] ? `$${lead['Factura Mensual']}` : '—'}
+                    {lead['Factura Mensual'] ? `$${String(lead['Factura Mensual'])}` : '—'}
                   </td>
                   <td className="px-6 py-4">
                     <span className={cn("badge", getStatusBadgeStyles(lead.Estado || lead['Estado Lead']))}>
-                      {lead.Estado || lead['Estado Lead'] || 'Nuevo'}
+                      {String(lead.Estado || lead['Estado Lead'] || 'Nuevo')}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-md border border-border">
-                      {lead['Origen del Lead'] || '—'}
+                      {String(lead['Origen del Lead'] || '—')}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-400">

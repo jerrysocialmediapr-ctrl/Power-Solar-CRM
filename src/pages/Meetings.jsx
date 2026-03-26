@@ -184,13 +184,13 @@ function MeetingCard({ meeting, onComplete, onCancel, onEdit, onDelete }) {
               )}
             </div>
             <h3 className="text-xl font-bold text-white">
-              {meeting['Título'] || meeting.Nombre}
+              {String(meeting['Título'] || meeting.Nombre || '')}
             </h3>
             {meeting['Título'] && meeting.Nombre && (
-              <p className="text-sm text-slate-400">{meeting.Nombre}</p>
+              <p className="text-sm text-slate-400">{String(meeting.Nombre || '')}</p>
             )}
           </div>
-          <span className={cn("badge shrink-0", getStatusStyles(meeting.Estado))}>{meeting.Estado}</span>
+          <span className={cn("badge shrink-0", getStatusStyles(meeting.Estado))}>{String(meeting.Estado || 'Pendiente')}</span>
         </div>
 
         {/* Details grid */}
@@ -225,13 +225,13 @@ function MeetingCard({ meeting, onComplete, onCancel, onEdit, onDelete }) {
           {meeting['Teléfono'] && (
             <div className="flex items-center gap-2 text-sm text-slate-400">
               <Phone className="w-4 h-4 text-slate-600" />
-              <span>{meeting['Teléfono']}</span>
+              <span>{String(meeting['Teléfono'] || '')}</span>
             </div>
           )}
           {meeting.Notas && (
             <div className="flex items-center gap-2 text-sm text-slate-400 md:col-span-3">
               <MessageSquare className="w-4 h-4 text-slate-600" />
-              <span className="italic truncate">{meeting.Notas}</span>
+              <span className="italic truncate">{String(meeting.Notas || '')}</span>
             </div>
           )}
         </div>
