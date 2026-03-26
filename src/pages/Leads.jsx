@@ -13,6 +13,7 @@ import {
   PRODUCT_TYPES, ECOFLOW_MODELOS, LOAN_TYPES, TRANSFER_SWITCH_OPTIONS,
   ECOFLOW_PRECIOS, TRANSFER_PRECIOS, PANELES_OPCIONES
 } from '../lib/constants';
+import { NotesManager } from '../components/NotesManager';
 
 export function Leads() {
   const { leads, updateLead, addLead, deleteLead, syncGoogleAds, sendBlast, convertLead, loading } = useStore();
@@ -30,7 +31,8 @@ export function Leads() {
     return leads.filter(lead => {
       const matchesSearch = [lead.Nombre, lead.Pueblo, lead.Email, lead['Teléfono']]
         .some(val => String(val || '').toLowerCase().includes(search.toLowerCase()));
-      const matchesStatus = statusFilter === 'Todos' || lead['Estado Lead'] === statusFilter;
+      const s = lead.Estado || lead['Estado Lead'] || '';
+      const matchesStatus = statusFilter === 'Todos' || s === statusFilter;
       const matchesOrigin = originFilter === 'Todos' || lead['Origen del Lead'] === originFilter;
       return matchesSearch && matchesStatus && matchesOrigin;
     });
@@ -103,8 +105,8 @@ export function Leads() {
                     {lead['Factura Mensual'] ? `$${lead['Factura Mensual']}` : '—'}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={cn("badge", getStatusBadgeStyles(lead['Estado Lead']))}>
-                      {lead['Estado Lead'] || 'Nuevo'}
+                    <span className={cn("badge", getStatusBadgeStyles(lead.Estado || lead['Estado Lead']))}>
+                      {lead.Estado || lead['Estado Lead'] || 'Nuevo'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -115,8 +117,10 @@ export function Leads() {
                   <td className="px-6 py-4 text-sm text-slate-400">
                     {(() => {
                       try {
-                        const d = lead['Fecha Creación'] ? new Date(lead['Fecha Creación']) : null;
-                        return d && !isNaN(d.getTime()) ? format(d, 'd MMM', { locale: es }) : '—';
+                        const raw = lead['Fecha Creación'] || lead.Fecha;
+                        if (!raw) return '—';
+                        const d = new Date(raw);
+                        return isNaN(d.getTime()) ? '—' : format(d, 'd MMM', { locale: es });
                       } catch (e) {
                         return '—';
                       }
@@ -231,30 +235,11 @@ function EditLeadModal({ lead, isOpen, onClose, onUpdate, onSync }) {
           <InputGroup label="Campaña" value={formData.Campaign} onChange={v => set('Campaign', v)} />
         </div>
 
-        <div className="bg-slate-800/40 p-4 rounded-xl border border-border">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h4 className="font-bold text-white text-sm">Google Ads Tracking</h4>
-              <p className="text-xs text-slate-500 mt-0.5">Sincronización de conversiones</p>
-            </div>
-            <button onClick={async () => { setIsSyncing(true); await onSync(lead._row); setIsSyncing(false); }}
-              disabled={isSyncing}
-              className={cn("btn bg-emerald-500 hover:bg-emerald-600 text-white text-xs gap-2 py-1.5", isSyncing && "opacity-50 animate-pulse")}
-            >
-              {isSyncing ? "Syncing..." : "Sync Google Ads"}
-            </button>
-          </div>
-          <div className="space-y-1.5 text-xs">
-            <div className="flex justify-between">
-              <span className="text-slate-500">Sync Status:</span>
-              <span className="text-slate-300 font-mono">{lead['Google Ads Sync'] || 'No sincronizado'}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-500">GCLID:</span>
-              <span className="text-slate-300 truncate max-w-[200px] font-mono">{lead.GCLID || 'N/A'}</span>
-            </div>
-          </div>
-        </div>
+        <div className="h-px bg-border" />
+        <NotesManager 
+          notesRaw={formData.Anotaciones} 
+          onUpdate={(val) => set('Anotaciones', val)} 
+        />
       </div>
     </Modal>
   );

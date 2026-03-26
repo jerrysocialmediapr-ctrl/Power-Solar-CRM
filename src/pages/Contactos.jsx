@@ -1,20 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { 
-  Search, 
-  Phone, 
-  Mail, 
-  MapPin, 
-  Calendar,
-  User,
-  ArrowRight
+  Search, Phone, Mail, MapPin, Calendar, User, ArrowRight, ChevronDown
 } from 'lucide-react';
+import { NotesManager } from '../components/NotesManager';
 import { useStore } from '../store/useStore';
 import { cn } from '../lib/utils';
-import { format } from 'date-fns';
-import { es as esLocale } from 'date-fns/locale';
-
-// EditLeadModal and helpers are currently defined in Leads.jsx. 
-// For better organization, we define a local version or should ideally move to shared components.
+import { Modal } from '../components/Modal';
 
 export function Contactos() {
   const { leads, updateLead, syncGoogleAds } = useStore();
@@ -76,6 +67,15 @@ function ContactCard({ contact, onClick }) {
     ? contact.Nombre.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : '??';
 
+  const safeDate = () => {
+    try {
+      const raw = contact['Fecha Creación'] || contact.Fecha;
+      if (!raw) return '—';
+      const d = new Date(raw);
+      return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('es-PR', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch { return '—'; }
+  };
+
   return (
     <div 
       onClick={onClick}
@@ -84,15 +84,15 @@ function ContactCard({ contact, onClick }) {
       <div className="flex items-start gap-4 mb-6">
         <div className={cn(
           "w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-bold shadow-inner group-hover:scale-110 transition-transform duration-300",
-          getStatusColor(contact['Estado Lead'])
+          getStatusColor(contact.Estado || contact['Estado Lead'])
         )}>
           {initials}
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-white font-bold truncate group-hover:text-primary transition-colors">{contact.Nombre}</h3>
           <div className="flex items-center gap-1.5 mt-1 text-slate-500 text-xs">
-            <span className={cn("badge py-0 px-2", getStatusBadgeStyles(contact['Estado Lead']))}>
-              {contact['Estado Lead'] || 'Pendiente'}
+            <span className={cn("badge py-0 px-2", getStatusBadgeStyles(contact.Estado || contact['Estado Lead']))}>
+              {contact.Estado || contact['Estado Lead'] || 'Pendiente'}
             </span>
             <span className="opacity-50">•</span>
             <span>{contact['Origen del Lead']}</span>
@@ -101,30 +101,16 @@ function ContactCard({ contact, onClick }) {
       </div>
 
       <div className="space-y-3">
-        <a 
-          href={`tel:${contact['Teléfono']}`} 
-          className="flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-colors"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="p-1.5 bg-slate-800 rounded-lg">
-            <Phone className="w-4 h-4" />
-          </div>
+        <a href={`tel:${contact['Teléfono']}`} className="flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-colors" onClick={(e) => e.stopPropagation()}>
+          <div className="p-1.5 bg-slate-800 rounded-lg"><Phone className="w-4 h-4" /></div>
           {contact['Teléfono']}
         </a>
-        <a 
-          href={`mailto:${contact.Email}`} 
-          className="flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-colors"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="p-1.5 bg-slate-800 rounded-lg">
-            <Mail className="w-4 h-4" />
-          </div>
+        <a href={`mailto:${contact.Email}`} className="flex items-center gap-3 text-sm text-slate-400 hover:text-white transition-colors" onClick={(e) => e.stopPropagation()}>
+          <div className="p-1.5 bg-slate-800 rounded-lg"><Mail className="w-4 h-4" /></div>
           <span className="truncate">{contact.Email || 'Sin email'}</span>
         </a>
         <div className="flex items-center gap-3 text-sm text-slate-400">
-          <div className="p-1.5 bg-slate-800 rounded-lg">
-            <MapPin className="w-4 h-4" />
-          </div>
+          <div className="p-1.5 bg-slate-800 rounded-lg"><MapPin className="w-4 h-4" /></div>
           {contact.Pueblo}
         </div>
       </div>
@@ -132,7 +118,7 @@ function ContactCard({ contact, onClick }) {
       <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase">
           <Calendar className="w-3.5 h-3.5" />
-          {format(new Date(contact.Fecha), 'd MMM yyyy', { locale: esLocale })}
+          {safeDate()}
         </div>
         <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-primary group-hover:translate-x-1 transition-all" />
       </div>
@@ -140,7 +126,6 @@ function ContactCard({ contact, onClick }) {
   );
 }
 
-// Reuse styles and helper functions 
 function getStatusColor(status) {
   switch (status) {
     case 'Vendido': return 'bg-emerald-500/20 text-emerald-500';
@@ -165,13 +150,7 @@ function getStatusBadgeStyles(status) {
   }
 }
 
-// Minimal re-implementation for extraction later or just keeping it here for simplicity
-import { Modal } from '../components/Modal';
-import { ChevronDown } from 'lucide-react';
-
 function ContactEditModal({ lead, isOpen, onClose, onUpdate, onSync }) {
-  // Use the same logic as Leads.jsx (I'll extract helpers to a shared file in the next step to keep DRY)
-  // For now I'll just provide a placeholder or full version. Full is better.
   const [formData, setFormData] = useState({ ...lead });
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -180,11 +159,18 @@ function ContactEditModal({ lead, isOpen, onClose, onUpdate, onSync }) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Editar Contacto" footer={<button onClick={handleSubmit} className="btn btn-primary">Guardar</button>}>
+    <Modal isOpen={isOpen} onClose={onClose} title={`Editar: ${lead.Nombre}`} footer={<button onClick={handleSubmit} className="btn btn-primary">Guardar</button>}>
       <div className="grid grid-cols-2 gap-4">
         <InputGroup label="Nombre" value={formData.Nombre} onChange={v => setFormData({...formData, Nombre: v})} />
         <InputGroup label="Teléfono" value={formData['Teléfono']} onChange={v => setFormData({...formData, 'Teléfono': v})} />
+        <InputGroup label="Email" value={formData.Email} onChange={v => setFormData({...formData, Email: v})} />
+        <InputGroup label="Pueblo" value={formData.Pueblo} onChange={v => setFormData({...formData, Pueblo: v})} />
       </div>
+      <div className="h-px bg-border my-6" />
+      <NotesManager 
+        notesRaw={formData.Anotaciones || formData.Notas} 
+        onUpdate={(val) => setFormData({...formData, Anotaciones: val})} 
+      />
     </Modal>
   );
 }

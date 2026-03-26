@@ -72,6 +72,7 @@ export function Meetings() {
             onComplete={(notes) => updateMeeting(meeting._row, { estado: 'Completado', notas: notes })}
             onCancel={() => updateMeeting(meeting._row, { estado: 'Cancelado' })}
             onEdit={() => setSelectedMeeting(meeting)}
+            onDelete={() => setDeleteConfirm(meeting)}
           />
         ))}
       </div>
@@ -131,13 +132,22 @@ function MeetingCard({ meeting, onComplete, onCancel, onEdit, onDelete }) {
 
   try {
     if (rawDate) {
-      const d = typeof rawDate === 'string' ? parseISO(rawDate) : rawDate;
-      dateDisplay = {
-        day: format(d, 'dd'),
-        month: format(d, 'MMM', { locale: es }).toUpperCase(),
-        year: format(d, 'yyyy'),
-      };
-      todayBadge = isToday(d);
+      // Handle raw ISO strings, GAS Date objects, or date strings
+      const dateStr = String(rawDate);
+      // Skip invalid dates like 1899-12-30
+      if (dateStr.startsWith('1899') || dateStr.startsWith('1900')) {
+        dateDisplay = { day: '—', month: '', year: '' };
+      } else {
+        const d = typeof rawDate === 'string' ? parseISO(rawDate) : new Date(rawDate);
+        if (!isNaN(d.getTime()) && d.getFullYear() > 2000) {
+          dateDisplay = {
+            day: format(d, 'dd'),
+            month: format(d, 'MMM', { locale: es }).toUpperCase(),
+            year: format(d, 'yyyy'),
+          };
+          todayBadge = isToday(d);
+        }
+      }
     }
   } catch (e) {}
 
@@ -189,7 +199,19 @@ function MeetingCard({ meeting, onComplete, onCancel, onEdit, onDelete }) {
             <div className="flex items-center gap-2 text-sm text-slate-400">
               <Clock className="w-4 h-4 text-slate-600" />
               <span className="font-bold text-slate-300">
-                {meeting['Hora Inicio']}{meeting['Hora Fin'] ? ` — ${meeting['Hora Fin']}` : ''}
+                {(() => {
+                  const h1 = meeting['Hora Inicio'];
+                  const h2 = meeting['Hora Fin'];
+                  // Only show if it looks like a real time (not a raw Date)
+                  const fmt = (t) => {
+                    if (!t) return '';
+                    const s = String(t);
+                    if (s.includes('1899') || s.includes('1900')) return '';
+                    return s.length <= 5 ? s : '';
+                  };
+                  const t1 = fmt(h1), t2 = fmt(h2);
+                  return t1 ? (t2 ? `${t1} — ${t2}` : t1) : '';
+                })()}
               </span>
             </div>
           )}

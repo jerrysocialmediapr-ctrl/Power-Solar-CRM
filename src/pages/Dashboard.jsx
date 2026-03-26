@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Users, 
   TrendingUp, 
@@ -48,9 +49,9 @@ export function Dashboard() {
     );
   }
 
-  // Metrics calculation
+  const status = (l) => l.Estado || l['Estado Lead'] || 'Pendiente';
   const totalLeads = leads.length;
-  const vendidos = leads.filter(l => l['Estado Lead'] === 'Vendido');
+  const vendidos = leads.filter(l => status(l) === 'Vendido');
   const totalVendido = vendidos.length;
   const conversionRate = totalLeads > 0 ? (totalVendido / totalLeads) * 100 : 0;
   
@@ -59,12 +60,12 @@ export function Dashboard() {
     return acc + (isNaN(val) ? 0 : val);
   }, 0);
 
-  const noContesta = leads.filter(l => l['Estado Lead'] === 'No contesta').length;
+  const noContesta = leads.filter(l => status(l) === 'No contesta').length;
 
   // Chart data
   const statusCounts = leads.reduce((acc, l) => {
-    const status = l['Estado Lead'] || 'Pendiente';
-    acc[status] = (acc[status] || 0) + 1;
+    const s = status(l);
+    acc[s] = (acc[s] || 0) + 1;
     return acc;
   }, {});
 
@@ -75,9 +76,11 @@ export function Dashboard() {
   }, {});
 
   const recentLeads = [...leads]
-    .filter(l => l['Fecha Creación'])
-    .sort((a, b) => new Date(b['Fecha Creación']) - new Date(a['Fecha Creación']))
+    .filter(l => l['Fecha Creación'] || l.Fecha)
+    .sort((a, b) => new Date(b['Fecha Creación'] || b.Fecha) - new Date(a['Fecha Creación'] || a.Fecha))
     .slice(0, 8);
+
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -171,7 +174,7 @@ export function Dashboard() {
       <div className="card overflow-hidden">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-bold text-white">Actividad Reciente</h3>
-          <button className="text-primary text-sm font-bold hover:underline flex items-center gap-1">
+          <button onClick={() => navigate('/leads')} className="text-primary text-sm font-bold hover:underline flex items-center gap-1">
             Ver todos <ArrowUpRight className="w-4 h-4" />
           </button>
         </div>
@@ -194,8 +197,8 @@ export function Dashboard() {
                   <td className="py-4 text-slate-400">{lead['Teléfono']}</td>
                   <td className="py-4 text-slate-400">{lead.Pueblo}</td>
                   <td className="py-4">
-                    <span className={cn("badge", getStatusBadgeStyles(lead['Estado Lead']))}>
-                      {lead['Estado Lead'] || 'Pendiente'}
+                    <span className={cn("badge", getStatusBadgeStyles(status(lead)))}>
+                      {status(lead)}
                     </span>
                   </td>
                   <td className="py-4">
