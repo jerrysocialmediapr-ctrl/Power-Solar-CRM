@@ -24,9 +24,7 @@ const sanitize = (val) => {
 const sanitizeRow = (row) => {
   const newRow = { ...row };
   Object.keys(newRow).forEach(key => {
-    if (key !== '_row') {
-      newRow[key] = sanitize(newRow[key]);
-    }
+    newRow[key] = sanitize(newRow[key]);
   });
   return newRow;
 };
