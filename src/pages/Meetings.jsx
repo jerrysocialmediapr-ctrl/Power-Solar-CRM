@@ -174,7 +174,7 @@ function MeetingCard({ meeting, onComplete, onCancel, onEdit, onDelete }) {
           <div>
             <div className="flex items-center gap-2 flex-wrap mb-1">
               <span className="badge bg-slate-800 text-slate-300 border border-border text-[10px] font-bold">
-                {meeting.Tipo}
+                {String(meeting.Tipo || '')}
               </span>
               {todayBadge && (
                 <span className="bg-amber-500/20 text-amber-500 text-[10px] font-black uppercase px-2 py-0.5 rounded-md animate-pulse">Hoy</span>
@@ -218,8 +218,8 @@ function MeetingCard({ meeting, onComplete, onCancel, onEdit, onDelete }) {
           {meeting['Lugar de Reunión'] && (
             <div className="flex items-center gap-2 text-sm text-slate-400">
               {lugarIcon}
-              <span>{meeting['Lugar de Reunión']}</span>
-              {meeting['Ubicación'] && <span className="text-slate-600">· {meeting['Ubicación']}</span>}
+              <span>{String(meeting['Lugar de Reunión'] || '')}</span>
+              {meeting['Ubicación'] && <span className="text-slate-600">· {String(meeting['Ubicación'] || '')}</span>}
             </div>
           )}
           {meeting['Teléfono'] && (

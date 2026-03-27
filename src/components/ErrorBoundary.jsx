@@ -18,6 +18,8 @@ export class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
+      const componentStack = this.state.errorInfo?.componentStack || '';
+      const firstComponent = componentStack.split('\n')[1] || '';
       return (
         <div className="min-h-screen bg-background flex items-center justify-center p-6 text-center">
           <div className="max-w-md w-full animate-in fade-in zoom-in duration-500">
@@ -33,9 +35,14 @@ export class ErrorBoundary extends React.Component {
             </p>
 
             <div className="bg-surface/50 border border-border rounded-2xl p-4 mb-8 text-left">
+              <p className="text-[10px] font-black uppercase text-slate-500 mb-2 tracking-widest">Componente Afectado:</p>
+              <div className="text-xs font-bold text-white mb-4 italic">
+                {firstComponent || 'Desconocido'}
+              </div>
               <p className="text-[10px] font-black uppercase text-slate-500 mb-2 tracking-widest">Detalle Técnico:</p>
               <div className="text-xs font-mono text-danger bg-danger/5 p-3 rounded-lg overflow-auto max-h-32">
                 {this.state.error?.toString() || 'Error desconocido'}
+                <pre className="mt-2 opacity-50 text-[10px]">{componentStack}</pre>
               </div>
             </div>
 
