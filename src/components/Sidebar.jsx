@@ -53,7 +53,7 @@ export function Sidebar() {
                 "ml-auto text-xs px-2 py-0.5 rounded-full font-bold",
                 "bg-slate-800 text-slate-400 group-hover:bg-slate-700"
               )}>
-                {leads.length}
+                {String(leads?.length || 0)}
               </span>
             )}
           </NavLink>

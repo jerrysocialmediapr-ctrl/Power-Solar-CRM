@@ -37,7 +37,7 @@ export function ProgressBarSkeleton() {
 export function TableSkeleton() {
   return (
     <div className="space-y-4">
-      {[...Array(5)].map((_, i) => (
+      {[1, 2, 3, 4, 5].map((i) => (
         <div key={i} className="flex items-center gap-4 px-6 py-4">
           <Skeleton className="h-10 w-full" />
         </div>
