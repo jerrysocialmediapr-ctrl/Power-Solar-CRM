@@ -61,8 +61,8 @@ async function apiRequest(action, method = 'GET', body = null) {
 }
 
 export const api = {
-  getLeads:      ()               => apiRequest('getLeads', 'GET'),
-  getMeetings:   ()               => apiRequest('getMeetings', 'GET'),
+  getLeads:      ()               => apiRequest('getLeads', 'POST', {}),
+  getMeetings:   ()               => apiRequest('getMeetings', 'POST', {}),
   addLead:       (lead)           => apiRequest('addLead', 'POST', lead),
   updateLead:    (row, data)      => apiRequest('updateLead', 'POST', { row, ...data }),
   deleteLead:    (row)            => apiRequest('deleteLead', 'POST', { row }),
