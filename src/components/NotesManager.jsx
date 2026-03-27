@@ -120,7 +120,7 @@ export function NotesManager({ notesRaw, onUpdate }) {
                     </button>
                   </div>
                 </div>
-                <p className="text-sm text-slate-200 whitespace-pre-wrap">{note.text}</p>
+                <p className="text-sm text-slate-200 whitespace-pre-wrap">{String(note.text || '')}</p>
               </>
             )}
           </div>
