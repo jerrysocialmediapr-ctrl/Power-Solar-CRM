@@ -141,9 +141,9 @@ export function Dashboard() {
               .sort((a, b) => b[1] - a[1])
               .map(([status, count]) => (
                 <ProgressBar 
-                  key={status} 
-                  label={status} 
-                  count={count} 
+                  key={String(status)} 
+                  label={String(status)} 
+                  count={String(count)} 
                   total={totalLeads} 
                   color={getStatusColor(status)}
                 />
@@ -159,9 +159,9 @@ export function Dashboard() {
               .sort((a, b) => b[1] - a[1])
               .map(([origin, count]) => (
                 <ProgressBar 
-                  key={origin} 
-                  label={origin} 
-                  count={count} 
+                  key={String(origin)} 
+                  label={String(origin)} 
+                  count={String(count)} 
                   total={totalLeads} 
                   color="bg-primary"
                 />
@@ -230,9 +230,9 @@ function StatCard({ label, value, subValue, icon: Icon, color, bg }) {
   return (
     <div className="card flex items-start justify-between group hover:border-primary/50 transition-colors duration-300">
       <div>
-        <p className="text-sm font-bold text-slate-400 mb-1">{label}</p>
-        <h4 className="text-2xl font-bold text-white">{value}</h4>
-        {subValue && <p className="text-xs text-emerald-500 font-bold mt-1">{subValue}</p>}
+        <p className="text-sm font-bold text-slate-400 mb-1">{String(label || '')}</p>
+        <h4 className="text-2xl font-bold text-white">{String(value || '')}</h4>
+        {subValue && <p className="text-xs text-emerald-500 font-bold mt-1">{String(subValue || '')}</p>}
       </div>
       <div className={cn("p-3 rounded-2xl group-hover:scale-110 transition-transform duration-300", bg)}>
         <Icon className={cn("w-6 h-6", color)} />
@@ -246,8 +246,8 @@ function ProgressBar({ label, count, total, color }) {
   return (
     <div className="space-y-1.5">
       <div className="flex justify-between text-sm font-bold">
-        <span className="text-slate-300">{label}</span>
-        <span className="text-slate-500">{count}</span>
+        <span className="text-slate-300">{String(label || '')}</span>
+        <span className="text-slate-500">{String(count || '')}</span>
       </div>
       <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
         <div 
