@@ -15,17 +15,33 @@ async function apiRequest(action, method = 'GET', body = null) {
 
   try {
     const url = new URL(GAS_URL);
-    url.searchParams.append('token', TOKEN);
-    url.searchParams.append('action', action);
-
-    if (body) {
-      url.searchParams.append('data', JSON.stringify(body));
+    // Para GET enviamos token y action en la URL
+    if (method === 'GET') {
+      url.searchParams.append('token', TOKEN);
+      url.searchParams.append('action', action);
+      if (body) {
+        url.searchParams.append('data', JSON.stringify(body));
+      }
     }
 
-    const response = await fetch(url.toString(), {
-      method: 'GET',
+    const fetchOptions = {
+      method: method,
       redirect: 'follow',
-    });
+    };
+
+    // Para POST enviamos un JSON en el body como pidió el cliente
+    if (method === 'POST') {
+      fetchOptions.headers = {
+        'Content-Type': 'application/json'
+      };
+      fetchOptions.body = JSON.stringify({
+        token: TOKEN,
+        action: action,
+        ...body
+      });
+    }
+
+    const response = await fetch(url.toString(), fetchOptions);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -45,14 +61,14 @@ async function apiRequest(action, method = 'GET', body = null) {
 }
 
 export const api = {
-  getLeads:      ()               => apiRequest('getLeads'),
-  getMeetings:   ()               => apiRequest('getMeetings'),
+  getLeads:      ()               => apiRequest('getLeads', 'GET'),
+  getMeetings:   ()               => apiRequest('getMeetings', 'GET'),
   addLead:       (lead)           => apiRequest('addLead', 'POST', lead),
   updateLead:    (row, data)      => apiRequest('updateLead', 'POST', { row, ...data }),
   deleteLead:    (row)            => apiRequest('deleteLead', 'POST', { row }),
   convertLead:   (row, data)      => apiRequest('convertLead', 'POST', { row, ...data }),
   sendBlast:     (tipo, subject, rows) => apiRequest('sendBlast', 'POST', { tipo, subject, rows }),
-  autoMark:      ()               => apiRequest('autoMark', 'POST'),
+  autoMark:      ()               => apiRequest('autoMark', 'POST', {}),
   syncGoogleAds: (row)            => apiRequest('syncGoogleAds', 'POST', { row }),
   addMeeting:    (meeting)        => apiRequest('addMeeting', 'POST', meeting),
   updateMeeting: (row, data)      => apiRequest('updateMeeting', 'POST', { row, ...data }),

@@ -58,7 +58,7 @@ export const useStore = create((set, get) => ({
       const sanitized = Array.isArray(data) ? data.map(sanitizeRow) : [];
       set({ leads: sanitized, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: String(error.message || error), loading: false });
     }
   },
 
@@ -69,7 +69,7 @@ export const useStore = create((set, get) => ({
       const sanitized = Array.isArray(data) ? data.map(sanitizeRow) : [];
       set({ meetings: sanitized, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: String(error.message || error), loading: false });
     }
   },
 
@@ -79,7 +79,7 @@ export const useStore = create((set, get) => ({
       await api.addLead(lead);
       await get().fetchLeads();
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: String(error.message || error), loading: false });
     }
   },
 
@@ -89,7 +89,7 @@ export const useStore = create((set, get) => ({
       await api.updateLead(row, data);
       await get().fetchLeads();
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: String(error.message || error), loading: false });
     }
   },
 
@@ -99,7 +99,7 @@ export const useStore = create((set, get) => ({
       await api.deleteLead(row);
       await get().fetchLeads();
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: String(error.message || error), loading: false });
     }
   },
 
@@ -109,7 +109,7 @@ export const useStore = create((set, get) => ({
       await api.convertLead(row, data);
       await get().fetchLeads();
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: String(error.message || error), loading: false });
     }
   },
 
@@ -119,7 +119,7 @@ export const useStore = create((set, get) => ({
       await api.addMeeting(meeting);
       await get().fetchMeetings();
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: String(error.message || error), loading: false });
     }
   },
 
@@ -129,7 +129,7 @@ export const useStore = create((set, get) => ({
       await api.updateMeeting(row, data);
       await get().fetchMeetings();
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: String(error.message || error), loading: false });
     }
   },
 
@@ -139,7 +139,7 @@ export const useStore = create((set, get) => ({
       await api.deleteMeeting(row);
       await get().fetchMeetings();
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: String(error.message || error), loading: false });
     }
   },
 
@@ -149,7 +149,7 @@ export const useStore = create((set, get) => ({
       await api.autoMark();
       await get().fetchLeads();
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: String(error.message || error), loading: false });
     }
   },
 
@@ -159,7 +159,7 @@ export const useStore = create((set, get) => ({
       await api.syncGoogleAds(row);
       await get().fetchLeads();
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: String(error.message || error), loading: false });
     }
   },
 
@@ -170,7 +170,7 @@ export const useStore = create((set, get) => ({
       set({ loading: false });
       return res;
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: String(error.message || error), loading: false });
       throw error;
     }
   },
@@ -182,7 +182,7 @@ export const useStore = create((set, get) => ({
       await get().fetchLeads();
       return res;
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: String(error.message || error), loading: false });
       throw error;
     }
   },
