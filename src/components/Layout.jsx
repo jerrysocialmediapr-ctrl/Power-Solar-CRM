@@ -8,9 +8,10 @@ export function Layout() {
   const { fetchLeads, fetchMeetings, loading, error, clearError } = useStore();
 
   useEffect(() => {
+    console.log("DEBUG: STORE STATE", { loading, error });
     fetchLeads();
     fetchMeetings();
-  }, [fetchLeads, fetchMeetings]);
+  }, [fetchLeads, fetchMeetings, loading, error]);
 
   return (
     <div className="min-h-screen bg-background">

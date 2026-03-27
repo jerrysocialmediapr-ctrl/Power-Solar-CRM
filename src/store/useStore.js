@@ -4,7 +4,10 @@ import { api, apiRequest } from '../lib/api';
 const getSafeUser = () => {
   try {
     const u = localStorage.getItem('ps_user');
-    return u ? JSON.parse(u) : null;
+    if (!u) return null;
+    const obj = JSON.parse(u);
+    // Sanitize to plain string-only keys
+    return { session_email: String(obj.email || obj.session_email || ''), session_name: String(obj.name || obj.session_name || '') };
   } catch (e) {
     return null;
   }
@@ -38,7 +41,7 @@ export const useStore = create((set, get) => ({
 
   login: (email, password) => {
     if (email === 'jerrypowersolar@gmail.com' && password === 'Ian110809') {
-      const user = { email, name: 'Jerry Encarnación' };
+      const user = { session_email: String(email), session_name: 'Jerry Encarnación' };
       localStorage.setItem('ps_user', JSON.stringify(user));
       set({ user, isAuthenticated: true });
       return true;
