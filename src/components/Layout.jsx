@@ -8,10 +8,9 @@ export function Layout() {
   const { fetchLeads, fetchMeetings, loading, error, clearError } = useStore();
 
   useEffect(() => {
-    console.log("DEBUG: STORE STATE", { loading, error });
     fetchLeads();
     fetchMeetings();
-  }, [fetchLeads, fetchMeetings, loading, error]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -32,11 +31,9 @@ export function Layout() {
               </button>
             </div>
           )}
-
           <div className={loading ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
             <Outlet />
           </div>
-
           {loading === true && (
             <div className="fixed bottom-8 right-8 bg-surface border border-border px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 z-50 animate-in fade-in zoom-in">
               <RefreshCw className="w-5 h-5 text-primary animate-spin" />
