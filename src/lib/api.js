@@ -1,58 +1,38 @@
+// ==========================================
+// POWER SOLAR CRM — lib/api.js v3.0 CORREGIDO
+// FIX CORS: Google Apps Script bloquea POST desde el browser.
+// SOLUCIÓN: Todos los requests usan GET con params en la URL.
+// ==========================================
+
 const GAS_URL = import.meta.env.VITE_GAS_URL;
 const TOKEN = import.meta.env.VITE_GAS_TOKEN;
 
-/**
- * GAS API wrapper.
- * All requests use GET with query params to avoid CORS/redirect issues
- * that occur with POST to Google Apps Script.
- * The action + payload is encoded as a base64 JSON string in the "data" param.
- */
-async function apiRequest(action, method = 'GET', body = null) {
+async function apiRequest(action, payload = {}) {
   if (!GAS_URL) {
     console.warn('VITE_GAS_URL no está configurada.');
     return { error: 'VITE_GAS_URL no configurada' };
   }
-
   try {
     const url = new URL(GAS_URL);
-    // Para GET enviamos token y action en la URL
-    if (method === 'GET') {
-      url.searchParams.append('token', TOKEN);
-      url.searchParams.append('action', action);
-      if (body) {
-        url.searchParams.append('data', JSON.stringify(body));
-      }
+    url.searchParams.append('token', TOKEN);
+    url.searchParams.append('action', action);
+    if (payload && Object.keys(payload).length > 0) {
+      url.searchParams.append('data', JSON.stringify(payload));
     }
 
-    const fetchOptions = {
-      method: method,
+    const response = await fetch(url.toString(), {
+      method: 'GET',
       redirect: 'follow',
-    };
-
-    // Para POST enviamos un JSON en el body como pidió el cliente
-    if (method === 'POST') {
-      fetchOptions.headers = {
-        'Content-Type': 'application/json'
-      };
-      fetchOptions.body = JSON.stringify({
-        token: TOKEN,
-        action: action,
-        ...body
-      });
-    }
-
-    const response = await fetch(url.toString(), fetchOptions);
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const result = await response.json();
-
     if (result && result.error) {
       throw new Error(result.error);
     }
-
     return result;
   } catch (error) {
     console.error(`API Error (${action}):`, error.message);
@@ -61,19 +41,19 @@ async function apiRequest(action, method = 'GET', body = null) {
 }
 
 export const api = {
-  getLeads:      ()               => apiRequest('getLeads', 'POST', {}),
-  getMeetings:   ()               => apiRequest('getMeetings', 'POST', {}),
-  addLead:       (lead)           => apiRequest('addLead', 'POST', lead),
-  updateLead:    (row, data)      => apiRequest('updateLead', 'POST', { row, ...data }),
-  deleteLead:    (row)            => apiRequest('deleteLead', 'POST', { row }),
-  convertLead:   (row, data)      => apiRequest('convertLead', 'POST', { row, ...data }),
-  sendBlast:     (tipo, subject, rows) => apiRequest('sendBlast', 'POST', { tipo, subject, rows }),
-  autoMark:      ()               => apiRequest('autoMark', 'POST', {}),
-  syncGoogleAds: (row)            => apiRequest('syncGoogleAds', 'POST', { row }),
-  addMeeting:    (meeting)        => apiRequest('addMeeting', 'POST', meeting),
-  updateMeeting: (row, data)      => apiRequest('updateMeeting', 'POST', { row, ...data }),
-  deleteMeeting: (row)            => apiRequest('deleteMeeting', 'POST', { row }),
-  forgotPassword:(email)          => apiRequest('forgotPassword', 'POST', { email }),
+  getLeads:      ()                     => apiRequest('getLeads'),
+  getMeetings:   ()                     => apiRequest('getMeetings'),
+  addLead:       (lead)                 => apiRequest('addLead', lead),
+  updateLead:    (row, data)            => apiRequest('updateLead', { row, ...data }),
+  deleteLead:    (row)                  => apiRequest('deleteLead', { row }),
+  convertLead:   (row, data)            => apiRequest('convertLead', { row, ...data }),
+  sendBlast:     (tipo, subject, rows)  => apiRequest('sendBlast', { tipo, subject, rows }),
+  autoMark:      ()                     => apiRequest('autoMark'),
+  syncGoogleAds: (row)                  => apiRequest('syncGoogleAds', { row }),
+  addMeeting:    (meeting)              => apiRequest('addMeeting', meeting),
+  updateMeeting: (row, data)            => apiRequest('updateMeeting', { row, ...data }),
+  deleteMeeting: (row)                  => apiRequest('deleteMeeting', { row }),
+  forgotPassword:(email)                => apiRequest('forgotPassword', { email }),
 };
 
 export { apiRequest };
