@@ -204,7 +204,6 @@ export function Leads() {
 // ============================================================
 function EditLeadModal({ lead, isOpen, onClose, onUpdate, onSync }) {
   const [formData, setFormData] = useState({ ...lead });
-  const [isSyncing, setIsSyncing] = useState(false);
 
   const set = (field, val) => setFormData(p => ({ ...p, [field]: val }));
 
@@ -230,7 +229,7 @@ function EditLeadModal({ lead, isOpen, onClose, onUpdate, onSync }) {
           <InputGroup label="Email" value={formData.Email} onChange={v => set('Email', v)} />
           <SelectGroup label="Pueblo" value={formData.Pueblo} options={PR_MUNICIPIOS} onChange={v => set('Pueblo', v)} />
           <CurrencyInput label="Factura Mensual" value={formData['Factura Mensual']} onChange={v => set('Factura Mensual', v)} />
-          <SelectGroup label="Estado Lead" value={formData['Estado Lead']} options={LEAD_STATUS_OPTIONS} onChange={v => set('Estado Lead', v)} />
+          <SelectGroup label="Estado Lead" value={formData['Estado Lead'] || formData.Estado} options={LEAD_STATUS_OPTIONS} onChange={v => { set('Estado Lead', v); set('Estado', v); }} />
           <SelectGroup label="Origen" value={formData['Origen del Lead']} options={ORIGIN_OPTIONS} onChange={v => set('Origen del Lead', v)} />
           <InputGroup label="Campaña" value={formData.Campaign} onChange={v => set('Campaign', v)} />
         </div>
@@ -328,18 +327,12 @@ function ConvertToContactModal({ lead, isOpen, onClose, onConvert }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await onConvert(lead._row, {
-      estado: 'Vendido',
-      ...formData,
-    });
+    await onConvert(lead._row, { estado: 'Vendido', ...formData });
     onClose();
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={`🎉 Convertir a Cliente: ${lead.Nombre}`}
+    <Modal isOpen={isOpen} onClose={onClose} title={`🎉 Convertir a Cliente: ${lead.Nombre}`}
       footer={
         <>
           <button onClick={onClose} className="btn btn-ghost">Cancelar</button>
@@ -350,7 +343,6 @@ function ConvertToContactModal({ lead, isOpen, onClose, onConvert }) {
       }
     >
       <div className="space-y-6">
-        {/* Lead Info Summary */}
         <div className="bg-slate-800/50 rounded-xl p-4 border border-border text-sm grid grid-cols-2 gap-2">
           <div><span className="text-slate-500">Cliente: </span><span className="text-white font-bold">{lead.Nombre}</span></div>
           <div><span className="text-slate-500">Teléfono: </span><span className="text-slate-300">{lead['Teléfono']}</span></div>
@@ -358,18 +350,15 @@ function ConvertToContactModal({ lead, isOpen, onClose, onConvert }) {
           <div><span className="text-slate-500">Factura: </span><span className="text-slate-300">${lead['Factura Mensual']}</span></div>
         </div>
 
-        {/* Tipo de Producto */}
         <div className="grid grid-cols-2 gap-4">
           <SelectGroup label="Tipo de Producto *" value={formData.tipoProducto} options={PRODUCT_TYPES} onChange={v => set('tipoProducto', v)} />
           <SelectGroup label="Financiamiento (Loan Type)" value={formData.loanType} options={LOAN_TYPES} onChange={v => set('loanType', v)} />
         </div>
 
-        {/* EcoFlow Fields */}
         {isEcoFlow && (
           <div className="space-y-4 animate-in fade-in duration-300">
             <div className="h-px bg-border" />
             <h4 className="text-xs font-black text-emerald-400 uppercase tracking-widest">Detalles EcoFlow</h4>
-
             <div className="grid grid-cols-2 gap-4">
               <SelectGroup label="Modelo de Batería *" value={formData.modeloBateria} options={ECOFLOW_MODELOS} onChange={v => set('modeloBateria', v)} />
               {precioRef && (
@@ -382,15 +371,10 @@ function ConvertToContactModal({ lead, isOpen, onClose, onConvert }) {
                 </div>
               )}
             </div>
-
             <div className="grid grid-cols-2 gap-4">
-              <InputGroup label="Extra Battery (cantidad)" value={formData.extraBatteryQty}
-                placeholder="Ej: 1, 2..."
-                onChange={v => set('extraBatteryQty', v)} />
-              <SelectGroup label="Transfer Switch / Smart Panel" value={formData.transferSwitch}
-                options={TRANSFER_SWITCH_OPTIONS} onChange={v => set('transferSwitch', v)} />
+              <InputGroup label="Extra Battery (cantidad)" value={formData.extraBatteryQty} placeholder="Ej: 1, 2..." onChange={v => set('extraBatteryQty', v)} />
+              <SelectGroup label="Transfer Switch / Smart Panel" value={formData.transferSwitch} options={TRANSFER_SWITCH_OPTIONS} onChange={v => set('transferSwitch', v)} />
             </div>
-
             {transferRef && (
               <div className="bg-slate-800/50 border border-border rounded-lg px-4 py-2 text-xs">
                 <div className="flex justify-between mb-0.5">
@@ -400,10 +384,8 @@ function ConvertToContactModal({ lead, isOpen, onClose, onConvert }) {
                 <p className="text-slate-500">{transferRef.nota}</p>
               </div>
             )}
-
             <div className="grid grid-cols-2 gap-4">
-              <InputGroup label="Paneles — Cantidad" value={formData.panelesQty}
-                placeholder="Ej: 5" onChange={v => set('panelesQty', v)} />
+              <InputGroup label="Paneles — Cantidad" value={formData.panelesQty} placeholder="Ej: 5" onChange={v => set('panelesQty', v)} />
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-500 uppercase px-1">Tipo de Panel</label>
                 <div className="relative">
@@ -423,29 +405,53 @@ function ConvertToContactModal({ lead, isOpen, onClose, onConvert }) {
           </div>
         )}
 
-        {/* Precio Total */}
         <div className="h-px bg-border" />
         <CurrencyInput label="Precio Total de la Venta *" value={formData.precioTotal} onChange={v => set('precioTotal', v)} />
-
-        <InputGroup label="Notas adicionales" value={formData.notas}
-          placeholder="Observaciones, detalles del cierre, etc." onChange={v => set('notas', v)} />
+        <InputGroup label="Notas adicionales" value={formData.notas} placeholder="Observaciones, detalles del cierre, etc." onChange={v => set('notas', v)} />
       </div>
     </Modal>
   );
 }
 
 // ============================================================
-// EMAIL BLAST MODAL
+// ✅ EMAIL BLAST MODAL — CORREGIDO
 // ============================================================
 function EmailBlastModal({ isOpen, onClose, leads, onSend }) {
   const [selectedRows, setSelectedRows] = useState(leads.map(l => l._row));
   const [tipo, setTipo] = useState('leasing');
   const [subject, setSubject] = useState('Oferta especial para ti');
   const [result, setResult] = useState(null);
+  const [sending, setSending] = useState(false);
 
   const toggleLead = (row) => setSelectedRows(p => p.includes(row) ? p.filter(r => r !== row) : [...p, row]);
-  const handleSend = async () => { const res = await onSend(tipo, subject, selectedRows); setResult(res); };
-  const leadsWithEmail = leads.filter(l => selectedRows.includes(l._row) && l.Email?.includes('@'));
+
+  // ✅ Fix: construye array de objetos {nombre, email} en vez de pasar solo rows
+  const handleSend = async () => {
+    setSending(true);
+    try {
+      const leadsToSend = leads
+        .filter(l => selectedRows.includes(l._row) && l.Email && l.Email.includes('@'))
+        .map(l => ({ nombre: l.Nombre || '', email: l.Email || '' }));
+
+      if (leadsToSend.length === 0) {
+        alert('No hay contactos con email válido seleccionados.');
+        setSending(false);
+        return;
+      }
+
+      const res = await onSend(tipo, subject, leadsToSend);
+      setResult(res);
+    } catch (err) {
+      alert('Error al enviar: ' + err.message);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  // ✅ Fix: cuenta correctamente los leads con email válido seleccionados
+  const leadsWithEmail = leads.filter(l =>
+    selectedRows.includes(l._row) && l.Email && l.Email.includes('@')
+  );
 
   if (result) return (
     <Modal isOpen={isOpen} onClose={onClose} title="Resultado de Envío">
@@ -454,7 +460,11 @@ function EmailBlastModal({ isOpen, onClose, leads, onSend }) {
           <CheckCircle2 className="w-10 h-10" />
         </div>
         <h4 className="text-2xl font-bold text-white mb-2">¡Blast Enviado!</h4>
-        <p className="text-slate-400">Se enviaron {result.sent} correos correctamente.</p>
+        {/* ✅ Fix: usa result.enviados que devuelve el GAS v4 */}
+        <p className="text-slate-400">Se enviaron {result.enviados ?? result.sent ?? 0} correos correctamente.</p>
+        {result.errores && result.errores.length > 0 && (
+          <p className="text-red-400 text-sm mt-2">{result.errores.length} error(es) al enviar.</p>
+        )}
         <button onClick={onClose} className="btn btn-primary mt-8 w-full">Entendido</button>
       </div>
     </Modal>
@@ -462,13 +472,22 @@ function EmailBlastModal({ isOpen, onClose, leads, onSend }) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Configurar Email Blast"
-      footer={<button onClick={handleSend} disabled={leadsWithEmail.length === 0} className="btn btn-primary w-full">
-        Enviar a {leadsWithEmail.length} contactos
-      </button>}
+      footer={
+        <button
+          onClick={handleSend}
+          disabled={leadsWithEmail.length === 0 || sending}
+          className="btn btn-primary w-full disabled:opacity-50"
+        >
+          {sending ? 'Enviando...' : `Enviar a ${leadsWithEmail.length} contactos`}
+        </button>
+      }
     >
       <div className="space-y-6">
         <div className="flex gap-4">
-          {[{ key: 'leasing', label: 'Leasing Solar', sub: 'Desde $176/mes' }, { key: 'expansion', label: 'Expansión Solar', sub: 'Desde $86/mes' }].map(opt => (
+          {[
+            { key: 'leasing', label: 'Leasing Solar', sub: 'Desde $176/mes' },
+            { key: 'expansion', label: 'Expansión Solar', sub: 'Desde $86/mes' }
+          ].map(opt => (
             <button key={opt.key} onClick={() => setTipo(opt.key)}
               className={cn("flex-1 p-4 rounded-xl border transition-all text-left", tipo === opt.key ? "border-primary bg-primary/10" : "border-border bg-slate-800/40")}>
               <p className={cn("text-xs font-bold mb-1", tipo === opt.key ? "text-primary" : "text-slate-500")}>{opt.key.toUpperCase()}</p>
@@ -477,20 +496,38 @@ function EmailBlastModal({ isOpen, onClose, leads, onSend }) {
             </button>
           ))}
         </div>
+
         <InputGroup label="Asunto del Correo" value={subject} onChange={setSubject} />
+
         <div className="space-y-2">
-          <h4 className="text-sm font-bold text-white px-1">Contactos</h4>
+          <div className="flex items-center justify-between px-1">
+            <h4 className="text-sm font-bold text-white">Contactos</h4>
+            <span className="text-xs text-slate-500">
+              {leadsWithEmail.length} con email válido de {selectedRows.length} seleccionados
+            </span>
+          </div>
           <div className="bg-slate-800/40 border border-border rounded-xl max-h-48 overflow-y-auto divide-y divide-border">
-            {leads.map(l => (
-              <div key={l._row} className="flex items-center gap-3 p-3 hover:bg-slate-800">
-                <input type="checkbox" checked={selectedRows.includes(l._row)} onChange={() => toggleLead(l._row)}
-                  className="w-4 h-4 rounded border-slate-700 bg-background text-primary" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-slate-200 truncate">{l.Nombre}</p>
-                  <p className="text-[10px] text-slate-500 truncate">{l.Email || 'Sin email'}</p>
+            {leads.map(l => {
+              const hasEmail = l.Email && l.Email.includes('@');
+              return (
+                <div key={l._row} className={cn("flex items-center gap-3 p-3 hover:bg-slate-800", !hasEmail && "opacity-40")}>
+                  <input
+                    type="checkbox"
+                    checked={selectedRows.includes(l._row)}
+                    onChange={() => toggleLead(l._row)}
+                    disabled={!hasEmail}
+                    className="w-4 h-4 rounded border-slate-700 bg-background text-primary"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-slate-200 truncate">{l.Nombre}</p>
+                    <p className={cn("text-[10px] truncate", hasEmail ? "text-slate-400" : "text-red-500")}>
+                      {l.Email || 'Sin email — no se enviará'}
+                    </p>
+                  </div>
+                  {hasEmail && <span className="text-[10px] text-emerald-500 font-bold">✓</span>}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
@@ -548,7 +585,7 @@ function SelectFilter({ value, onChange, options }) {
       <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
       <select className="w-full bg-background border border-border rounded-lg pl-10 pr-4 py-2 text-sm appearance-none outline-none focus:ring-2 focus:ring-primary/20 text-slate-300"
         value={value} onChange={(e) => onChange(e.target.value)}>
-        {options.map(opt => <option key={opt} value={opt}>{opt === 'Todos' ? (options[0] === 'Todos' ? 'Todos los Estados' : 'Todos') : opt}</option>)}
+        {options.map(opt => <option key={opt} value={opt}>{opt === 'Todos' ? 'Todos los Estados' : opt}</option>)}
       </select>
       <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
     </div>
