@@ -190,4 +190,3 @@ export const useStore = create((set, get) => ({
  
   clearError: () => set({ error: null }),
 }));
-   isAuthenticated: !!localStorage.getItem('ps_user'),
