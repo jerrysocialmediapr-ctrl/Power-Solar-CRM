@@ -14,7 +14,7 @@ import {
   ECOFLOW_PRECIOS, TRANSFER_PRECIOS, PANELES_OPCIONES
 } from '../lib/constants';
 import { NotesManager } from '../components/NotesManager';
-
+ 
 export function Leads() {
   const { leads, updateLead, addLead, deleteLead, syncGoogleAds, sendBlast, convertLead, loading } = useStore();
   const [search, setSearch] = useState('');
@@ -26,7 +26,7 @@ export function Leads() {
   const [isBlastModalOpen, setIsBlastModalOpen] = useState(false);
   const [convertLead_, setConvertLead_] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-
+ 
   const filteredLeads = useMemo(() => {
     return leads.filter(lead => {
       const matchesSearch = [lead.Nombre, lead.Pueblo, lead.Email, lead['Teléfono']]
@@ -37,12 +37,12 @@ export function Leads() {
       return matchesSearch && matchesStatus && matchesOrigin;
     });
   }, [leads, search, statusFilter, originFilter]);
-
+ 
   const handleDelete = async (lead) => {
     await deleteLead(lead._row);
     setDeleteConfirm(null);
   };
-
+ 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -59,7 +59,7 @@ export function Leads() {
           </button>
         </div>
       </div>
-
+ 
       {/* Filters */}
       <div className="card grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="relative">
@@ -71,7 +71,7 @@ export function Leads() {
         <SelectFilter value={statusFilter} onChange={setStatusFilter} options={['Todos', ...LEAD_STATUS_OPTIONS]} />
         <SelectFilter value={originFilter} onChange={setOriginFilter} options={['Todos', ...ORIGIN_OPTIONS]} />
       </div>
-
+ 
       {/* Leads Table */}
       <div className="card p-0 overflow-hidden">
         <div className="overflow-x-auto">
@@ -150,30 +150,30 @@ export function Leads() {
           </table>
         </div>
       </div>
-
+ 
       {/* Edit Modal */}
       {selectedLead && (
         <EditLeadModal lead={selectedLead} isOpen={!!selectedLead}
           onClose={() => setSelectedLead(null)} onUpdate={updateLead} onSync={syncGoogleAds} />
       )}
-
+ 
       {/* Add Modal */}
       {isAddModalOpen && (
         <AddLeadModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onAdd={addLead} />
       )}
-
+ 
       {/* Email Blast Modal */}
       {isBlastModalOpen && (
         <EmailBlastModal isOpen={isBlastModalOpen} onClose={() => setIsBlastModalOpen(false)}
           leads={filteredLeads} onSend={sendBlast} />
       )}
-
+ 
       {/* Convert to Contact Modal */}
       {convertLead_ && (
         <ConvertToContactModal lead={convertLead_} isOpen={!!convertLead_}
           onClose={() => setConvertLead_(null)} onConvert={convertLead} />
       )}
-
+ 
       {/* Delete Confirm */}
       {deleteConfirm && (
         <Modal isOpen={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Eliminar Lead"
@@ -198,21 +198,21 @@ export function Leads() {
     </div>
   );
 }
-
+ 
 // ============================================================
 // EDIT LEAD MODAL
 // ============================================================
 function EditLeadModal({ lead, isOpen, onClose, onUpdate, onSync }) {
   const [formData, setFormData] = useState({ ...lead });
-
+ 
   const set = (field, val) => setFormData(p => ({ ...p, [field]: val }));
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     await onUpdate(lead._row, formData);
     onClose();
   };
-
+ 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Editar: ${lead.Nombre}`}
       footer={
@@ -233,7 +233,7 @@ function EditLeadModal({ lead, isOpen, onClose, onUpdate, onSync }) {
           <SelectGroup label="Origen" value={formData['Origen del Lead']} options={ORIGIN_OPTIONS} onChange={v => set('Origen del Lead', v)} />
           <InputGroup label="Campaña" value={formData.Campaign} onChange={v => set('Campaign', v)} />
         </div>
-
+ 
         <div className="h-px bg-border" />
         <NotesManager 
           notesRaw={formData.Anotaciones} 
@@ -243,7 +243,7 @@ function EditLeadModal({ lead, isOpen, onClose, onUpdate, onSync }) {
     </Modal>
   );
 }
-
+ 
 // ============================================================
 // ADD LEAD MODAL
 // ============================================================
@@ -252,9 +252,9 @@ function AddLeadModal({ isOpen, onClose, onAdd }) {
     nombre: '', telefono: '', email: '', pueblo: '', factura: '',
     origen: '', estado: '', campaign: '', gclid: ''
   });
-
+ 
   const set = (field, val) => setFormData(p => ({ ...p, [field]: val }));
-
+ 
   const handleGclidPaste = (val) => {
     if (val.includes('gclid=')) {
       const gclid = val.split('gclid=')[1].split('&')[0];
@@ -265,13 +265,13 @@ function AddLeadModal({ isOpen, onClose, onAdd }) {
       set('gclid', val);
     }
   };
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     await onAdd(formData);
     onClose();
   };
-
+ 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Nuevo Lead Manual"
       footer={
@@ -302,7 +302,7 @@ function AddLeadModal({ isOpen, onClose, onAdd }) {
     </Modal>
   );
 }
-
+ 
 // ============================================================
 // CONVERT TO CONTACT MODAL
 // ============================================================
@@ -318,19 +318,19 @@ function ConvertToContactModal({ lead, isOpen, onClose, onConvert }) {
     precioTotal: '',
     notas: '',
   });
-
+ 
   const set = (field, val) => setFormData(p => ({ ...p, [field]: val }));
   const isEcoFlow = formData.tipoProducto === 'EcoFlow';
-
+ 
   const precioRef = isEcoFlow && formData.modeloBateria ? ECOFLOW_PRECIOS[formData.modeloBateria] : null;
   const transferRef = formData.transferSwitch ? TRANSFER_PRECIOS[formData.transferSwitch] : null;
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     await onConvert(lead._row, { estado: 'Vendido', ...formData });
     onClose();
   };
-
+ 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`🎉 Convertir a Cliente: ${lead.Nombre}`}
       footer={
@@ -349,12 +349,12 @@ function ConvertToContactModal({ lead, isOpen, onClose, onConvert }) {
           <div><span className="text-slate-500">Pueblo: </span><span className="text-slate-300">{lead.Pueblo}</span></div>
           <div><span className="text-slate-500">Factura: </span><span className="text-slate-300">${lead['Factura Mensual']}</span></div>
         </div>
-
+ 
         <div className="grid grid-cols-2 gap-4">
           <SelectGroup label="Tipo de Producto *" value={formData.tipoProducto} options={PRODUCT_TYPES} onChange={v => set('tipoProducto', v)} />
           <SelectGroup label="Financiamiento (Loan Type)" value={formData.loanType} options={LOAN_TYPES} onChange={v => set('loanType', v)} />
         </div>
-
+ 
         {isEcoFlow && (
           <div className="space-y-4 animate-in fade-in duration-300">
             <div className="h-px bg-border" />
@@ -404,7 +404,7 @@ function ConvertToContactModal({ lead, isOpen, onClose, onConvert }) {
             </div>
           </div>
         )}
-
+ 
         <div className="h-px bg-border" />
         <CurrencyInput label="Precio Total de la Venta *" value={formData.precioTotal} onChange={v => set('precioTotal', v)} />
         <InputGroup label="Notas adicionales" value={formData.notas} placeholder="Observaciones, detalles del cierre, etc." onChange={v => set('notas', v)} />
@@ -412,7 +412,7 @@ function ConvertToContactModal({ lead, isOpen, onClose, onConvert }) {
     </Modal>
   );
 }
-
+ 
 // ============================================================
 // ✅ EMAIL BLAST MODAL — CORREGIDO
 // ============================================================
@@ -422,9 +422,9 @@ function EmailBlastModal({ isOpen, onClose, leads, onSend }) {
   const [subject, setSubject] = useState('Oferta especial para ti');
   const [result, setResult] = useState(null);
   const [sending, setSending] = useState(false);
-
+ 
   const toggleLead = (row) => setSelectedRows(p => p.includes(row) ? p.filter(r => r !== row) : [...p, row]);
-
+ 
   // ✅ Fix: construye array de objetos {nombre, email} en vez de pasar solo rows
   const handleSend = async () => {
     setSending(true);
@@ -432,13 +432,13 @@ function EmailBlastModal({ isOpen, onClose, leads, onSend }) {
       const leadsToSend = leads
         .filter(l => selectedRows.includes(l._row) && l.Email && l.Email.includes('@'))
         .map(l => ({ nombre: l.Nombre || '', email: l.Email || '' }));
-
+ 
       if (leadsToSend.length === 0) {
         alert('No hay contactos con email válido seleccionados.');
         setSending(false);
         return;
       }
-
+ 
       const res = await onSend(tipo, subject, leadsToSend);
       setResult(res);
     } catch (err) {
@@ -447,12 +447,12 @@ function EmailBlastModal({ isOpen, onClose, leads, onSend }) {
       setSending(false);
     }
   };
-
+ 
   // ✅ Fix: cuenta correctamente los leads con email válido seleccionados
   const leadsWithEmail = leads.filter(l =>
     selectedRows.includes(l._row) && l.Email && l.Email.includes('@')
   );
-
+ 
   if (result) return (
     <Modal isOpen={isOpen} onClose={onClose} title="Resultado de Envío">
       <div className="text-center py-8">
@@ -469,7 +469,7 @@ function EmailBlastModal({ isOpen, onClose, leads, onSend }) {
       </div>
     </Modal>
   );
-
+ 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Configurar Email Blast"
       footer={
@@ -496,9 +496,9 @@ function EmailBlastModal({ isOpen, onClose, leads, onSend }) {
             </button>
           ))}
         </div>
-
+ 
         <InputGroup label="Asunto del Correo" value={subject} onChange={setSubject} />
-
+ 
         <div className="space-y-2">
           <div className="flex items-center justify-between px-1">
             <h4 className="text-sm font-bold text-white">Contactos</h4>
@@ -534,7 +534,7 @@ function EmailBlastModal({ isOpen, onClose, leads, onSend }) {
     </Modal>
   );
 }
-
+ 
 // ============================================================
 // REUSABLE UI COMPONENTS
 // ============================================================
@@ -548,7 +548,7 @@ function InputGroup({ label, value, onChange, placeholder, type = "text" }) {
     </div>
   );
 }
-
+ 
 function CurrencyInput({ label, value, onChange }) {
   return (
     <div className="space-y-1.5">
@@ -562,7 +562,7 @@ function CurrencyInput({ label, value, onChange }) {
     </div>
   );
 }
-
+ 
 function SelectGroup({ label, value, options, onChange }) {
   return (
     <div className="space-y-1.5">
@@ -578,7 +578,7 @@ function SelectGroup({ label, value, options, onChange }) {
     </div>
   );
 }
-
+ 
 function SelectFilter({ value, onChange, options }) {
   return (
     <div className="relative">
@@ -591,7 +591,7 @@ function SelectFilter({ value, onChange, options }) {
     </div>
   );
 }
-
+ 
 function getStatusBadgeStyles(status) {
   switch (status) {
     case 'Vendido': return 'bg-emerald-500/10 text-emerald-500';
