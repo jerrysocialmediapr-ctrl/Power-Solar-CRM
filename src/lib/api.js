@@ -5,7 +5,7 @@
 // ==========================================
 const GAS_URL = import.meta.env.VITE_GAS_URL;
 const TOKEN = import.meta.env.VITE_GAS_TOKEN;
-
+ 
 async function apiRequest(action, payload = {}) {
   if (!GAS_URL) {
     console.warn('VITE_GAS_URL no está configurada.');
@@ -36,7 +36,7 @@ async function apiRequest(action, payload = {}) {
     throw error;
   }
 }
-
+ 
 export const api = {
   getLeads:      ()                     => apiRequest('getLeads'),
   getMeetings:   ()                     => apiRequest('getMeetings'),
@@ -53,5 +53,6 @@ export const api = {
   deleteMeeting: (row)                  => apiRequest('deleteMeeting', { row }),
   forgotPassword:(email)                => apiRequest('forgotPassword', { email }),
 };
-
+ 
 export { apiRequest };
+ 
